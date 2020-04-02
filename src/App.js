@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
+import { findWinner, computerTurn } from './computerMove'
 
 const App = () => {
 
@@ -11,84 +12,36 @@ const App = () => {
     if (turn === 'X') setTurn('O')
     else setTurn('X')
   }
+
   const handleClick = (i) => {
-    console.log('h', i, 'board: ', boardSize[i])
-    if (boardSize[i] === '') {
+    console.log('HANDLEKLIK ALKU', i, 'board: ', boardSize[i])
+    if (boardSize[i] === '' && !winner) {
       console.log('handleClick', i)
       let changedBoard = boardSize.concat()
       changedBoard[i] = turn
       setBoardSize(changedBoard)
       changeTurn()
-      setWinner(findWinner(boardSize))
+      console.log('findwinner: ', findWinner(boardSize))
+      setWinner(findWinner(changedBoard))
     }
     else return
   }
-  const doComputerMove = (sTurn, original) => {
+  const doComputerMove = (board, sTurn, original) => {
     console.log('COMPUTER MOVE')
     let myMove = -1, myScore = -99
-    const nextTurn = sTurn === 'X' ? 'O' : 'X'
     for (let i = 0; i < 9; i++) {
-      if (boardSize[i] === '') {
-        let newboard = boardSize.concat()
+      if (board[i] === '') {
+        let newboard = board.concat()
         newboard[i] = sTurn
-        const newTurn = computerTurn(newboard, nextTurn, 0)
+        const newTurn = computerTurn(newboard, sTurn, original)
         if (newTurn > myScore) {
           myScore = newTurn
           myMove = i
         }
       }
     }
-    console.log('comp', myMove)
-    if(original) handleClick(myMove)
-    else console.log('nääh')
-  }
-  const computerTurn = (simBoard, sTurn, original) => {
-
-    let tempBoard = simBoard
-    const simuWinner = findWinner(tempBoard)
-    if (simuWinner) {
-      if (simuWinner === turn) return 10
-      else if (simuWinner === 'D') return 0
-      else return -10
-    }
-
-    // const nextTurn = sTurn === 'X' ? 'O' : 'X'
-    // let plalautus = 0
-    // let moveIndex = -1
-    // for (let i = 0; i < tempBoard.length; i++) {
-    //   if (tempBoard[i] === '') {
-    //     let newboard = tempBoard
-    //     newboard[i] = sTurn
-    //     const newTurn = computerTurn(newboard, nextTurn, 0)
-    //     if (newTurn > plalautus) {
-    //       plalautus += newTurn
-    //       moveIndex = i
-    //     }
-    //   }
-    // }
-    console.log('ei löydy')
-    return -20
-  }
-  const findWinner = (boxes) => {
-    console.log('find winner')
-    if (!boardSize.includes('')) return 'D'
-    const rows = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6]
-    ]
-    for (let i = 0; i < rows.length; i++) {
-      const [a, b, c] = rows[i]
-      if (boxes[a] !== '' && boxes[a] === boxes[b] && boxes[a] === boxes[c]) {
-        return boxes[a]
-      }
-    }
-    return null
+    console.log('comp move: ', myMove)
+    handleClick(myMove)
   }
   const Square = ({ s, i }) => {
     return (
@@ -105,7 +58,8 @@ const App = () => {
       <div className="board">
         {boardSize.map((s, i) => <Square key={i} s={s} i={i} />)}
       </div>
-      <div>      <button onClick={() => doComputerMove(turn, true)}>comp</button>
+      <div>
+        <button onClick={() => doComputerMove(boardSize, turn, turn)}>comp</button>
         <button onClick={() => console.log(boardSize)}>boardi</button>
       </div>
     </>
