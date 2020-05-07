@@ -79,9 +79,10 @@ const App = () => {
     // doComputerMove(boardSize, 'O', 'O')    
   }
   const Winner = () => {
-    if (!winner) return <button onClick={() => computerStart()}>Computer start</button>
+    if (!winner && boardSize.filter(b => b === '').length === 9) return <button onClick={() => computerStart()}>Computer start</button>
     else if (winner === 'D') return <> <p>Tasapeli!</p><button onClick={() => playAgain()}>Play again!</button></>
-  else return <> <p>{winner} voitti!</p><button onClick={() => playAgain()}>Play again!</button></>
+  else if (winner === 'X' || winner === 'O') return <> <p>{winner} voitti!</p><button onClick={() => playAgain()}>Play again!</button></>
+  else return null
   }
   return (
     <>
